@@ -7,16 +7,15 @@ import java.io.OutputStream
 
 fun main() {
 
-    apiServer(port = 8001) {
+    apiServer(8080) {
         route("/api") {
-            route("/{id}", "GET") { exchange->
-                exchange.sendResponseHeaders(200, "Hello World".length.toLong())
-                exchange.responseHeaders.add("Content-Type", "text/plain")
+            route(path = "1" , methods = "GET") { exchange ->
+                val response = "Hello, World!"
+                exchange.sendResponseHeaders(200, response.length.toLong())
                 val outputStream: OutputStream = exchange.responseBody
-                outputStream.write("Hello World".toByteArray())
+                outputStream.write(response.toByteArray())
                 outputStream.close()
             }
         }
-
     }.start()
 }

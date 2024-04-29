@@ -19,7 +19,8 @@ fun ServerContext.route(path: String = "", methods: String, handler: (HttpExchan
     }
 
     this.server.createContext(fullPath) { exchange ->
-        if (methods.isNotEmpty() && exchange.requestMethod == methods) {
+        if (methods.isNotEmpty() && exchange.requestMethod == methods
+            && exchange.requestURI.path == fullPath) {
             handler.invoke(exchange)
         } else {
             val response = """{"error": "Method Not Allowed"}"""
