@@ -43,7 +43,13 @@ fun HttpServer.route(path: String = "/", block: ServerContext.() -> Unit): Serve
     return context
 }
 
-fun ServerContext.route(path: String = "", methods: String, handler: (HttpExchange) -> Unit) {
+
+fun ServerContext.route(
+    path: String = "",
+    methods: String,
+    request: HashMap<String, Any>? = null,
+    handler: (HttpExchange, HashMap<String, Any>?) -> Unit
+) {
     val fullPath = if (path.isNotEmpty()) {
         "${this.path}/$path"
     } else {
@@ -55,11 +61,59 @@ fun ServerContext.route(path: String = "", methods: String, handler: (HttpExchan
 
         if (methods.isNotEmpty() && exchange.requestMethod == methods
             && exchange.requestURI.path == fullPath) {
-            handler.invoke(exchange)
+            val requestBody = exchange.requestBody
+            if (request == null){
+                handler.invoke(exchange, null)
+            }else{
+                val requestData = RequestHandler.handleRequest(requestBody)
+                if (requestData == null){
+                    handleError(exchange, getStatusByCode(400))
+                }
+                handler.invoke(exchange, requestData!!)
+            }
             return@createContext
         }
         handleError(exchange, getStatusByCode(500))
     }
+}
+
+fun <T> ServerContext.route(
+    path: String = "",
+    methods: String,
+    request: Class<T>?,
+    handler: (HttpExchange, T?) -> Unit
+) {
+    val fullPath = if (path.isNotEmpty()) {
+        "${this.path}/$path"
+    } else {
+        this.path
+    }
+
+    this.server.createContext(fullPath) { exchange ->
+        handleRequestError(exchange, methods, fullPath)
+
+        if (methods.isNotEmpty() && exchange.requestMethod == methods
+            && exchange.requestURI.path == fullPath) {
+            val requestBody = exchange.requestBody
+            val requestData = if (request != null) {
+                RequestHandler.readJsonFromInputStream(requestBody, request)
+            } else {
+                null
+            }
+            handler.invoke(exchange, requestData)
+        } else {
+            handleError(exchange, getStatusByCode(405))
+        }
+    }
+}
+
+fun <T> HttpExchange.response(status: Int, response: T) {
+    val responseBody = response.toString()
+    val bytes = responseBody.toByteArray(Charsets.UTF_8)
+    sendResponseHeaders(status, bytes.size.toLong())
+    val outputStream: OutputStream = getResponseBody()
+    outputStream.write(bytes)
+    outputStream.close()
 }
 
 private fun handleRequestError(exchange: HttpExchange, methods: String, path: String) {
@@ -67,21 +121,23 @@ private fun handleRequestError(exchange: HttpExchange, methods: String, path: St
     val reqContentType = exchange.requestHeaders.getFirst("Content-Type")
     val reqPath = exchange.requestURI.path
 
-    if (!isMethodAllowed(methods, requestMethod)) {
+    if (methods.isNotEmpty() && requestMethod != methods) {
         handleError(exchange, getStatusByCode(405))
+        return
     }
 
-    if (!contentTypes.contains(reqContentType)){
+    if (!contentTypes.contains(reqContentType)) {
         handleError(exchange, getStatusByCode(400))
+        return
     }
 
-    if (path == "/notfound" || path != reqPath) {
+    if (path != reqPath) {
         handleError(exchange, getStatusByCode(404))
+        return
     }
 }
 
-
-private fun handleError(exchange: HttpExchange, status:StatusCode) {
+private fun handleError(exchange: HttpExchange, status: StatusCode) {
     val response = """{"message": "${status.message}", "code": ${status.code}}"""
     exchange.sendResponseHeaders(status.code, response.length.toLong())
     exchange.responseHeaders.add("Content-Type", "application/json")
@@ -90,7 +146,6 @@ private fun handleError(exchange: HttpExchange, status:StatusCode) {
     outputStream.close()
 }
 
-
 fun apiServer(port: Int = 8080, block: HttpServer.() -> Unit): HttpServer {
     val server = HttpServer.create(InetSocketAddress(port), 0)
     server.block()
@@ -98,14 +153,5 @@ fun apiServer(port: Int = 8080, block: HttpServer.() -> Unit): HttpServer {
 }
 
 private fun getStatusByCode(code: Int): StatusCode {
-    for (statusCode in statusCodes) {
-        if (statusCode.code == code) {
-            return statusCode
-        }
-    }
-    return StatusCode(500, "Internal Server Error")
-}
-
-private fun isMethodAllowed(method: String, requestMethodType: String): Boolean {
-    return requestMethodType == method
+    return statusCodes.firstOrNull { it.code == code } ?: StatusCode(500, "Internal Server Error")
 }
