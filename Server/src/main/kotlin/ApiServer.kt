@@ -1,3 +1,4 @@
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
 import java.io.OutputStream
@@ -108,8 +109,10 @@ fun <T> ServerContext.route(
 }
 
 fun <T> HttpExchange.response(status: Int, response: T) {
-    val responseBody = response.toString()
+    val objectMapper = ObjectMapper()
+    val responseBody = objectMapper.writeValueAsString(response)
     val bytes = responseBody.toByteArray(Charsets.UTF_8)
+    responseHeaders.add("Content-Type", "application/json")
     sendResponseHeaders(status, bytes.size.toLong())
     val outputStream: OutputStream = getResponseBody()
     outputStream.write(bytes)
