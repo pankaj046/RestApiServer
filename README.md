@@ -41,7 +41,7 @@ Usage
     
 3.  Implement route handling logic within the provided handler function, specifying the HTTP method(s) and desired behavior.
     
-        server.route("/example", methods = "GET") { exchange ->
+        route(path = "login" , request = LoginRequest::class.java, methods = "POST") { exchange, req->
             // Handle GET requests for the "/example" route
         }
     
@@ -55,22 +55,18 @@ Example
 
 Here's a simple example demonstrating how to create a basic HTTP server using this framework:
 
-    import com.sun.net.httpserver.HttpExchange;
-    import com.sun.net.httpserver.HttpServer;
-    import java.net.InetSocketAddress;
-    
-    fun main() {
-        val server = apiServer(port = 8080) {
-            route("/hello", methods = "GET") { exchange ->
-                val response = "Hello, World!";
-                exchange.sendResponseHeaders(200, response.length.toLong());
-                val outputStream = exchange.responseBody;
-                outputStream.write(response.toByteArray());
-                outputStream.close();
+    apiServer(8080) {
+        route("/api") {
+            route(path = "login" , request = LoginRequest::class.java, methods = "POST") { exchange, req->
+                exchange.response(200, req)
             }
-        }.start();
-        println("Server started on port 8080");
-    }
+
+            route(path = "2", request = HashMap(), methods = "POST") { exchange, req->
+                val response = "${req?.get("Email")}"
+                exchange.response(200, response)
+            }
+        }
+    }.start()
 
 Dependencies
 ------------
