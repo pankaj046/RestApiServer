@@ -8,7 +8,7 @@ fun main() {
 
     apiServer(8080) {
         route("/api") {
-            route(path = "1" , request = LoginRequest::class.java, methods = "POST") { exchange, req->
+            route(path = "login" , request = LoginRequest::class.java, methods = "POST") { exchange, req->
                 exchange.response(200, req)
             }
 
