@@ -1,10 +1,10 @@
-Project Name: HTTP Server Framework (Fun Project)
+Project Name: HTTP Server Library (Fun Project)
 ===================================
 
 Description
 -----------
 
-This project is a lightweight HTTP server framework implemented in Kotlin, providing developers with an easy-to-use platform to create RESTful APIs. It simplifies the process of setting up HTTP servers and defining routes for handling various HTTP methods and request types.
+This project is a lightweight HTTP server Library implemented in Kotlin, providing developers with an easy-to-use platform to create RESTful APIs. It simplifies the process of setting up HTTP servers and defining routes for handling various HTTP methods and request types.
 
 Features
 --------
@@ -53,7 +53,7 @@ Usage
 Example
 -------
 
-Here's a simple example demonstrating how to create a basic HTTP server using this framework:
+Here's a simple example demonstrating how to create a basic HTTP server using this library:
 
     apiServer(8080) {
         route("/api") {
