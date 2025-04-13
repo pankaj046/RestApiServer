@@ -1,4 +1,4 @@
-Kotlin Coroutine-Based HTTP Server
+Kotlin Coroutine-Based HTTP Server (Fun Project)
 ==================================
 
 This project is a lightweight HTTP server library built using **Kotlin Coroutines**. It allows you to define RESTful routes easily and handle JSON-based HTTP requests/responses in a clean, coroutine-first style.
