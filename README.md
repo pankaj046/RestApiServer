@@ -1,106 +1,172 @@
-Project Name: HTTP Server Library (Fun Project)
-===================================
+Kotlin Coroutine-Based HTTP Server
+==================================
 
-Description
+This project is a lightweight HTTP server library built using **Kotlin Coroutines**. It allows you to define RESTful routes easily and handle JSON-based HTTP requests/responses in a clean, coroutine-first style.
+
+🚀 Features
 -----------
 
-This project is a lightweight HTTP server Library implemented in Kotlin, providing developers with an easy-to-use platform to create RESTful APIs. It simplifies the process of setting up HTTP servers and defining routes for handling various HTTP methods and request types.
+*   Lightweight and fast server
+*   Clean routing DSL
+*   JSON request/response handling
+*   Coroutine-based request processing
+*   Dynamic routes and path parameters
+*   Easy to extend and customize
 
-Features
---------
+🧰 Tech Stack
+-------------
 
-*   **Simple Routing:** Define routes effortlessly using a fluent API. || DONE
-*   **Status Code Handling:** Automatically handle common HTTP status codes.  || PENDING
-*   **Content Type Validation:** Validate incoming request content types. || PENDING
-*   **Error Handling:** Handle method not allowed, content type not supported, and route not found errors gracefully.  || WORKING
-*   **Customizable:** Easily customize port number and server configurations.  || DONE
+*   Kotlin (JVM)
+*   Coroutines
+*   kotlinx.serialization (for JSON handling)
+*   Java’s built-in `HttpServer`
 
-Installation
+🚀 Getting Started
+------------------
+
+Follow these steps to get the server up and running:
+
+### 1\. Clone the Repository
+
+    git clone https://github.com/yourusername/coroutine-http-server.git
+    cd coroutine-http-server
+
+### 2\. Build the Project
+
+    ./gradlew build
+
+### 3\. Run the Server
+
+    ./gradlew run
+
+📌 Example API Endpoints
+------------------------
+
+### ✅ Health Check
+
+**URL:** `/api`
+
+**Method:** `GET`
+
+**Response:**
+
+    
+    {
+      "status": "healthy",
+      "timestamp": 1715018245000
+    }
+        
+
+### 🔐 Login
+
+**URL:** `/api`
+
+**Method:** `POST`
+
+**Request Body:**
+
+    
+    {
+      "email": "user@example.com",
+      "password": "password123"
+    }
+        
+
+**Response:**
+
+    
+    {
+      "success": true,
+      "message": "Login successful",
+      "user": {
+        "email": "user@example.com"
+      }
+    }
+        
+
+### 🔄 Dynamic JSON
+
+**URL:** `/api/dynamic`
+
+**Method:** `POST`
+
+**Request Body:** Any JSON object
+
+**Response:**
+
+    
+    {
+      "received": { "key": "value" },
+      "message": "Data received successfully"
+    }
+        
+
+### 👤 User Routes
+
+#### GET User by ID
+
+**URL:** `/api/users/{id}`
+
+**Method:** `GET`
+
+#### PUT Update User
+
+**URL:** `/api/users/{id}`
+
+**Method:** `PUT`
+
+**Request Body:**
+
+    
+    {
+      "name": "John Doe",
+      "email": "john@example.com"
+    }
+        
+
+#### DELETE User
+
+**URL:** `/api/users/{id}`
+
+**Method:** `DELETE`
+
+📁 Project Structure
+--------------------
+
+    
+    src/
+    ├── Main.kt                   # Entry point, defines API routes
+    ├── Server.kt                 # Core server engine
+    ├── Context.kt                # Request context handler
+    ├── Models.kt                 # Request/response models
+    └── Json.kt                   # JSON serializer using kotlinx.serialization
+        
+
+🧩 Extending the Server
+-----------------------
+
+You can define your own routes using the `route`, `get`, `post`, `put`, and `delete` functions:
+
+    route("/myroute") {
+        get { ctx ->
+            ctx.respond(200, mapOf("message" to "Hello from /myroute"))
+        }
+    }
+        
+
+🧪 Test with curl
+-----------------
+
+    curl -X POST http://localhost:8080/api -H "Content-Type: application/json" \
+      -d '{"email": "test@example.com", "password": "123456"}'
+        
+
+👨‍💻 Author
 ------------
 
-1.  Clone this repository.
-    
-        git clone https://github.com/pankaj046/RestApiServer.git
-    
-2.  Import the project into your preferred Kotlin IDE.
+Developed with ❤️ by [Pankaj](https://github.com/pankaj046)
 
-Usage
------
+📄 License
+----------
 
-1.  Create a new HTTP server instance using the `apiServer` function, specifying the port number.
-    
-        val server = apiServer(port = 8080) {
-            // Define server routes here
-        }
-    
-2.  Define routes using the `route` function within the server instance.
-    
-        server.route("/example") {
-            // Define route handling logic here
-        }
-    
-3.  Implement route handling logic within the provided handler function, specifying the HTTP method(s) and desired behavior.
-    
-        route(path = "login" , request = LoginRequest::class.java, methods = "POST") { exchange, req->
-            // Handle GET requests for the "/example" route
-        }
-    
-4.  Start the server by calling the `start` method.
-    
-        server.start()
-    
-
-Example
--------
-
-Here's a simple example demonstrating how to create a basic HTTP server using this library:
-
-    apiServer(8080) {
-        route("/api") {
-            route(path = "login" , request = LoginRequest::class.java, methods = "POST") { exchange, req->
-                exchange.response(200, req)
-            }
-
-            route(path = "2", request = HashMap(), methods = "POST") { exchange, req->
-                val response = "${req?.get("Email")}"
-                exchange.response(200, response)
-            }
-        }
-    }.start()
-
-Dependencies
-------------
-
-*   Kotlin
-*   JDK (Java Development Kit)
-
-License
--------
-
-# Released under MIT License
-
-Permission is hereby granted, free of charge, to any person obtaining a copy 
-of this software and associated documentation files (the "Software"), to deal 
-in the Software without restriction, including without limitation the rights 
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do so,
-subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all 
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-Authors
--------
-
-*   [Pankaj]([https://github.com/pankaj046](https://github.com/pankaj046))
-
-Contact
--------
-
-For any inquiries or support, please contact [pankaj\dev.pankaj046@gmail.com](mailto:dev.pankaj046@gmail.com).
+This project is licensed under the MIT License.
