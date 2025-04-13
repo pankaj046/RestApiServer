@@ -28,8 +28,8 @@ Follow these steps to get the server up and running:
 
 ### 1\. Clone the Repository
 
-    git clone https://github.com/yourusername/coroutine-http-server.git
-    cd coroutine-http-server
+    git clone https://github.com/pankaj046/RestApiServer.git
+    cd RestApiServer
 
 ### 2\. Build the Project
 
@@ -128,19 +128,7 @@ Follow these steps to get the server up and running:
 
 **URL:** `/api/users/{id}`
 
-**Method:** `DELETE`
-
-📁 Project Structure
---------------------
-
-    
-    src/
-    ├── Main.kt                   # Entry point, defines API routes
-    ├── Server.kt                 # Core server engine
-    ├── Context.kt                # Request context handler
-    ├── Models.kt                 # Request/response models
-    └── Json.kt                   # JSON serializer using kotlinx.serialization
-        
+**Method:** `DELETE`        
 
 🧩 Extending the Server
 -----------------------
